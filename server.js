@@ -33,7 +33,7 @@ require('./app/controllers/eventController')(router);
 app.use('', router);
 
 // rev your engines
-
+eventSrc.refreshEvents();
 app.listen(port);
 console.log("we're live on port " + port);
 exports = module.exports = app;
