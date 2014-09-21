@@ -11,11 +11,11 @@ var EventSchema = new Schema({
   features: [ String ],
   url: String,
   imageUrl: String,
-  location: mongoose.Schema.Types.ObjectId
+  location: { type: Schema.Types.ObjectId, ref: 'Location' }
 });
 
 EventSchema.statics.findByName = function (name, cb){
-  this.find({ name: new RegExp(name, 'i')}, cb);
+  this.find({ title: new RegExp(name, 'i')}, cb);
 };
 
 module.exports = mongoose.model('Event', EventSchema);

@@ -5,6 +5,8 @@ var
 
   Event   = require('../models/event'),
 
+  Location = require('../models/location'),
+
   request    = require('request'),
 
   parser  = require('xml2js').parseString,
@@ -29,7 +31,6 @@ function processArray(array){
 
 function processDate(date, time){
   var formattedDate = moment(date + ' ' + time, "MM/DD/YYYY h:mm a");
-  console.log(formattedDate);
   return formattedDate;
 };
 
@@ -48,7 +49,14 @@ function processEvent(entry){
       var imageUrl = entry['events:Image'][0];
 
       var event = new Event ({
-        
+        title: title,
+        description: description,
+        organizer: organizer,
+        startDate: startDate,
+        endDate: endDate,
+        tags: tags,
+        features: features,
+        imageUrl: imageUrl
       });
       console.log('New event: ' + event.title);
       event.save(function(err){
@@ -56,9 +64,11 @@ function processEvent(entry){
           console.log('Error in saving: ' + err);
           return deferred.reject(err);
         }
-        deferred.resolve(this);
+        return deferred.resolve(this);
       });
     }
+    else
+      return deferred.resolve(events[0]);
   });
   return deferred.promise;
 }
@@ -68,21 +78,32 @@ function processLocation(entry){
   Location.findByName(entry['events:Venue'],
     function(err, locations){
       if(locations.length == 0){
-        var coords = {entry['events:VenueLat'][0], entry['events:VenueLong'][0]};
-        var venueName = entry['events:Venue'][0];
-        var location = new Location({
-          name: venueName,
-          coords: coords
-        });
+        var
+          lng = entry['events:VenueLong'][0],
+
+          lat = entry['events:VenueLat'][0],
+
+          coords = { lat: lat, lng: lng },
+
+          venueName = entry['events:Venue'][0],
+
+          location = new Location({
+            name: venueName,
+            coords: coords
+          });
+
+
         console.log('New location: ' + location.name);
-        location.save(function(err){
+        location.save(function(err, location){
           if (err){
             console.log('Error in saving: ' + err);
             return deferred.reject(err);
           }
-          deferred.resolve(this);
+          deferred.resolve(location);
         });
       }
+      else
+        return deferred.resolve(locations[0]);
   });
   return deferred.promise;
 }
@@ -92,68 +113,93 @@ function processJson(out){
 
   for (var id in out) {
     (function(id) {
-      var entry = out[id];
-      var processors = [];
-      processors.push(processLocation(entry));
+      var 
+        entry = out[id],
+        processors = [];
+
       processors.push(processEvent(entry));
-      Q.all(promises)
+      processors.push(processLocation(entry));
+
+      q.all(processors)
         .then(function(results){
-          var event = results[0];
+          
+          if (results[0].location) {
+            return;
+          }
+
           var location = results[1];
-          event.location = location;
-          event.save(function(err){
-            if(err)
-              console.log('Error in all: ' + err);
-            else
-              console.log('Event ' + event.name + ' processed!');
-          });
-        })
-        .fail(function(err){
+
+          // find and update event
+          Event.findOneAndUpdate(
+            { _id: results[0]._id },
+            { location: location._id },
+            function(err, doc) {
+              if (err) {
+                return console.log('An error occurred.', err);
+              }
+            }
+          )
+        }).fail(function(err){
           console.log('Something happened in processing ' + err);
-        })
+        });
     })(id);
   }
   };
 
 function convertToJson(out){
   console.log('UCSB Parser: Parsing Events'); 
+
   var deferred = q.defer();
-  parser(out, {trim: true}, function (err, result){
-    if (err) {
-      deferred.reject(err);
+
+  parser(out, {trim: true},
+    function (err, result){
+      if (err)
+        deferred.reject(err);
+
+      processJson(result.rss.channel[0].item);
+      deferred.resolve(result.rss.channel[0].item);
     }
-    processJson(result.rss.channel[0].item);
-    deferred.resolve(result.rss.channel[0].item);
-  });
+  );
   return deferred.promise;
 };  
 
 function pullEvents(){
   console.log('UCSB Parser: Pulling Events'); 
-  var deferred = q.defer();
-  var url = "https://events.as.ucsb.edu/mobile-feed";
-  request(url, function(err, res, body){
-    if (err) {
-      deferred.reject(err);
-    }
-    deferred.resolve(body);
-  });
+
+  var 
+    deferred = q.defer(),
+    url = "https://events.as.ucsb.edu/mobile-feed";
+
+  request(url,
+    function(err, res, body){
+      if (err) {
+        return deferred.reject(err);
+      }
+      deferred.resolve(body);
+    });
 
   return deferred.promise;
 };
 
 exports.refreshEvents = function(){
   console.log('UCSB Parser: Refreshing Events');
+
   var deferred = q.defer();
+
   pullEvents()
     .then(convertToJson)
-    .then(function(out){
-      console.log("UCSB Parser: Over and Out");
-      return deferred.resolve(out);
-    })
-    .fail(function(err) {
-      console.log("Failed to return events");
-      return deferred.resolve(err)
-    });
+
+    .then(
+      function(out){
+        console.log("UCSB Parser: Over and Out");
+        return deferred.resolve(out);
+      })
+
+    .fail(
+      function(err){
+        console.log("Failed to return events " + err);
+        return deferred.reject(err)
+      });
+
   return deferred.promise;
 };

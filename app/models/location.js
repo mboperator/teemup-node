@@ -6,4 +6,8 @@ var LocationSchema = new Schema({
   coords: { lat: Number, lng: Number }
 });
 
-module.exports = mongoose.model('Event', EventSchema);
+LocationSchema.statics.findByName = function (name, cb){
+  this.find({ name: name }, cb);
+};
+
+module.exports = mongoose.model('Location', LocationSchema);
