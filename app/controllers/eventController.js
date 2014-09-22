@@ -22,16 +22,7 @@ module.exports = function (router){
 
   router.route('/api/events')
     .get(function(req, res){
-      // eventSrc.refreshEvents(res);
 
-      /*
-      Event.find(function(err, events){
-        if (err) {
-          return res.send(500);
-          }
-          return res.send(events);
-      })
-      */
       Event
         .find({})
         .populate('location')
@@ -44,11 +35,16 @@ module.exports = function (router){
         });
     });
 
-  router.route('/api/events/:event_id')
+  router.route('/api/events/:tag')
 
-    .post(function(req, res) {
-      Event.findById(req.params.event_id, function(err, eve){
-
-      })
-    })
+    .get(function(req, res) {
+      Event
+        .findByTag(req.params.tag, function(err, events){
+          if (err) {
+            console.log('Events Get Error: ' + err);
+            return res.send(500);
+          }
+          return res.send(events);
+        });
+    });
 }

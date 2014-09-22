@@ -37,7 +37,10 @@ function processDate(date, time){
 
 function processEvent(entry){
   var deferred = q.defer();
+  // Look for existing event
   Event.findByName(entry.title[0], function(err, events){
+
+    // If none found, create a new event
     if(events.length == 0){
       var title = entry.title[0];
       var description = entry['events:description'][0];
@@ -58,7 +61,7 @@ function processEvent(entry){
         features: features,
         imageUrl: imageUrl
       });
-      console.log('New event: ' + event.title);
+
       event.save(function(err){
         if (err){
           console.log('Error in saving: ' + err);
@@ -67,6 +70,8 @@ function processEvent(entry){
         return deferred.resolve(this);
       });
     }
+
+    // If event found, return that
     else
       return deferred.resolve(events[0]);
   });
@@ -75,8 +80,12 @@ function processEvent(entry){
 
 function processLocation(entry){
   var deferred = q.defer();
+
+  // Check if location exists already
   Location.findByName(entry['events:Venue'],
     function(err, locations){
+
+      // If not, create a new location
       if(locations.length == 0){
         var
           lng = entry['events:VenueLong'][0],
@@ -92,16 +101,19 @@ function processLocation(entry){
             coords: coords
           });
 
-
-        console.log('New location: ' + location.name);
+        // Save created location
         location.save(function(err, location){
           if (err){
             console.log('Error in saving: ' + err);
             return deferred.reject(err);
           }
+
+          // Return promise with location instance
           deferred.resolve(location);
         });
       }
+
+      // If location is found, return that
       else
         return deferred.resolve(locations[0]);
   });
@@ -111,25 +123,28 @@ function processLocation(entry){
 function processJson(out){
   console.log('UCSB Parser: Saving Events');
 
+  // Iterate through JSON Records
   for (var id in out) {
     (function(id) {
       var 
         entry = out[id],
         processors = [];
 
+      // Process Event and Location for One Record
       processors.push(processEvent(entry));
       processors.push(processLocation(entry));
 
+      // When all processing is complete, assign location
       q.all(processors)
         .then(function(results){
-          
+
           if (results[0].location) {
             return;
           }
 
           var location = results[1];
 
-          // find and update event
+          // find and update event location
           Event.findOneAndUpdate(
             { _id: results[0]._id },
             { location: location._id },
@@ -155,8 +170,10 @@ function convertToJson(out){
     function (err, result){
       if (err)
         deferred.reject(err);
-
+      // Parse JSON into Database
       processJson(result.rss.channel[0].item);
+
+      // Return Promise
       deferred.resolve(result.rss.channel[0].item);
     }
   );
@@ -186,7 +203,10 @@ exports.refreshEvents = function(){
 
   var deferred = q.defer();
 
+  // Pull XML File
   pullEvents()
+
+    // Turn XML to JSON
     .then(convertToJson)
 
     .then(
