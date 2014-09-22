@@ -7,6 +7,8 @@ var
   
   q       = require('q'),
 
+  schedule = require('node-schedule'),
+
   ucsb    = require('../services/ucsbParser'),
 
   options = {};
@@ -24,17 +26,27 @@ function aggregateEvents(){
       return deferred.reject(out);
     });
   return deferred.promise;
-};
+}
 
-exports.refreshEvents = function(res){
+function refreshEvents(){
   console.log('Event Processor: Refreshing Events');
 
   aggregateEvents()
     .then(function(out){
       console.log("Finished Processing Events.");
-      res.send(out);
     })
     .fail(function(err){
-      res.send(500, 'Event Processor: I broked it. ' + err);
+      console.log('Event Processor: I broked it. ' + err);
     });
-};
+}
+
+//Schedules scrape @ 7am every day
+exports.run = function(){
+  var rule = new schedule.RecurrenceRule();
+  rule.hour = 7;
+  schedule.scheduleJob(rule, function(){
+    console.log("Scheduled scrape running");
+    refreshEvents();
+  });
+  console.log("Scrape scheduled");
+}

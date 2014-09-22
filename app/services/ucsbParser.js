@@ -49,6 +49,7 @@ function processEvent(entry){
       var endDate = processDate(entry['events:startdate'][0], entry['events:EndTime'][0]);
       var tags = processArray(entry['events:Subjects']);
       var features = processArray(entry['events:Features']);
+      var url = entry.link[0];
       var imageUrl = entry['events:Image'][0];
 
       var event = new Event ({
@@ -58,6 +59,7 @@ function processEvent(entry){
         startDate: startDate,
         endDate: endDate,
         tags: tags,
+        url: url,
         features: features,
         imageUrl: imageUrl
       });

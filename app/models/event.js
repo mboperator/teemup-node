@@ -42,7 +42,7 @@ EventSchema.statics.findByTag = function(tag, cb){
     default:
       break;
   }
-  console.log(tags);
+
   this.find()
     .where('tags')
     .in(tags)

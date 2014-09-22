@@ -36,8 +36,8 @@ module.exports = function (router){
     });
 
   router.route('/api/events/:tag')
-
     .get(function(req, res) {
+      
       Event
         .findByTag(req.params.tag, function(err, events){
           if (err) {
