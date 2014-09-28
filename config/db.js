@@ -1,4 +1,4 @@
 // config/db.js
   module.exports = {
-    url: 'mongodb://localhost/teemup'
+    url: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/teemup';
   }
