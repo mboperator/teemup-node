@@ -1,5 +1,6 @@
 var mongoose    = require('mongoose');
 var Schema      = mongoose.Schema;
+var arrayForTag = require('../util/tagHelper').arrayForTag;
 
 var EventSchema = new Schema({
   title: String,
@@ -8,6 +9,7 @@ var EventSchema = new Schema({
   startDate: { type: Date, default: Date.now },
   endDate: { type: Date, default: Date.now },
   tags: [ String ],
+  umbrellas: [ String ],
   features: [ String ],
   url: String,
   imageUrl: String,
@@ -45,7 +47,7 @@ EventSchema.statics.findByTag = function(tag, cb){
 
   this.find()
     .where('tags')
-    .in(tags)
+    .in(arrayForTag(tag))
     .exec(cb);
 }
 

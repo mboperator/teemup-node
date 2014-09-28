@@ -28,23 +28,23 @@ module.exports = function (router){
         .populate('location')
         .exec(function(err, events) {
           if (err) {
-            console.log('Events Get Error: ' + err);
+            console.log('events error ' + err);
             return res.send(500);
           }
-          return res.send(events);
+          return res.send({'events': events});
         });
     });
 
   router.route('/api/events/:tag')
     .get(function(req, res) {
-      
+
       Event
         .findByTag(req.params.tag, function(err, events){
           if (err) {
-            console.log('Events Get Error: ' + err);
+            console.log('events/tag error: ' + err);
             return res.send(500);
           }
-          return res.send(events);
+          return res.send({'events': events});
         });
     });
 }

@@ -12,6 +12,12 @@ var
   parser  = require('xml2js').parseString,
 
   moment = require('moment'),
+
+  checkUmbrella = require('../util/tagHelper').checkUmbrella,
+
+  locationQueue = {},
+
+  url = "https://events.as.ucsb.edu/mobile-feed",
   
   q       = require('q'),
 
@@ -32,8 +38,7 @@ function processArray(array){
 function processDate(date, time){
   var formattedDate = moment(date + ' ' + time, "MM/DD/YYYY h:mm a");
   return formattedDate;
-};
-
+}
 
 function processEvent(entry){
   var deferred = q.defer();
@@ -48,6 +53,7 @@ function processEvent(entry){
       var startDate = processDate(entry['events:startdate'][0], entry['events:time'][0]);
       var endDate = processDate(entry['events:startdate'][0], entry['events:EndTime'][0]);
       var tags = processArray(entry['events:Subjects']);
+      var tag = checkUmbrella(tags);
       var features = processArray(entry['events:Features']);
       var url = entry.link[0];
       var imageUrl = entry['events:Image'][0];
@@ -81,12 +87,21 @@ function processEvent(entry){
 }
 
 function processLocation(entry){
-  var deferred = q.defer();
+  var 
+    deferred = q.defer(),
+    venueName = entry['events:Venue'][0];
+
+  // check if querying / queried for venue already
+  if (locationQueue[venueName]) {
+    return locationQueue[venueName];
+  }
+
+  // add deferred to queue
+  locationQueue[venueName] = deferred.promise;
 
   // Check if location exists already
-  Location.findByName(entry['events:Venue'],
+  Location.findByName(venueName,
     function(err, locations){
-
       // If not, create a new location
       if(locations.length == 0){
         var
@@ -185,9 +200,7 @@ function convertToJson(out){
 function pullEvents(){
   console.log('UCSB Parser: Pulling Events'); 
 
-  var 
-    deferred = q.defer(),
-    url = "https://events.as.ucsb.edu/mobile-feed";
+  var deferred = q.defer();
 
   request(url,
     function(err, res, body){

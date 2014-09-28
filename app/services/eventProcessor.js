@@ -40,7 +40,7 @@ function refreshEvents(){
     });
 }
 
-//Schedules scrape @ 7am every day
+// Schedules scrape @ 7am every day
 exports.run = function(){
   var rule = new schedule.RecurrenceRule();
   rule.hour = 7;
@@ -50,3 +50,8 @@ exports.run = function(){
   });
   console.log("Scrape scheduled");
 }
+
+// exports.run = function(){
+//   refreshEvents();
+//   console.log("Scraping now");
+// }
