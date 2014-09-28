@@ -7,8 +7,6 @@ var
 
   ep      = require('../services/eventProcessor'),
 
-  parser  = require('rssparser'),
-
   eventSrc= require('../services/eventProcessor'),
 
   options = {};

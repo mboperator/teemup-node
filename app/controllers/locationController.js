@@ -1,5 +1,4 @@
 var Location   = require('./models/location');
-var parser  = require('rssparser');
 // event controller
 module.exports = function (router){
   router.route('/api/locations')
