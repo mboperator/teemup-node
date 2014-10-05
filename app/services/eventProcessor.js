@@ -42,7 +42,7 @@ function refreshEvents(){
     });
 }
 
-Schedules scrape @ 7am every day
+// Schedules scrape @ 7am every day
 
 exports.schedule = function(){
   var rule = new schedule.RecurrenceRule();
