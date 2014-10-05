@@ -39,7 +39,7 @@ module.exports = function (router){
       Event
         .findByTag(req.params.tag)
         .then(function(out){
-          res.send(out);
+          res.send({'events': out});
         })
         .fail(function(err){
           res.send(404);

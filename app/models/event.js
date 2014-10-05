@@ -6,7 +6,7 @@ var
 
   Schema      = mongoose.Schema,
 
-  arrayForTag = require('../util/tagHelper').arrayForTag;
+  tagHelper = require('../util/tagHelper');
 
   EventSchema = new Schema({
     title: String,
@@ -30,7 +30,7 @@ EventSchema.statics.findByTag = function(tag){
   var deferred = q.defer();
   this.find()
     .where('tags')
-    .in(arrayForTag(tag))
+    .in(tagHelper.arrayForTag(tag))
     .populate('location')
     .exec(function(err, events){
       if(err)
@@ -44,13 +44,25 @@ EventSchema.statics.countByTag = function(tag){
   var deferred = q.defer();
   this.count()
     .where('tags')
-    .in(arrayForTag(tag))
+    .in(tagHelper.arrayForTag(tag))
     .exec(function(err, count){
       if(err)
         return deferred.reject(err);
       deferred.resolve(count);
     });
   return deferred.promise;
+}
+
+EventSchema.statics.populateMissingUmbrellas = function(){
+  this.find()
+    .where({tags: {$not: {$size:0}}})
+    .where({umbrellas: {$size: 0}})
+    .exec(function(err, events){
+      for(var key in events){
+        tagHelper.checkUmbrella(events[key].tags);
+        events[key].tags
+      }
+    });
 }
 
 module.exports = mongoose.model('Event', EventSchema);
