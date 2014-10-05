@@ -1,43 +1,35 @@
-var tags = {
-  'artculture': ["University Events", "Humanities", "Art/Design", "Social Sciences"],
-  'athletics': ["Athletics"],
-  'lectures': ["Engineering/Technology", "Education", "Business", "Religious/Spiritual", "Law", "Science", "Environment"],
-  'movies': ["Movies"],
-  'performances': ["Theater & Dance", "Music", "Drama", "Comedy"],
-  'workshops': ["Community/Public Service", "Careers", "Isla Vista Community"],
-};
+var
 
-function intersect(a, b) {
-    var t;
-    if (b.length > a.length) t = b, b = a, a = t; // indexOf to loop over shorter
-    return a.filter(function (e) {
-        if (b.indexOf(e) !== -1) return true;
-    });
-}
+  Event = require('../models/event'),
 
-exports.checkUmbrella = function(tag){
+  q     = require('q'),
 
-      var umbrellas = [];
+  _ = require('underscore'),
 
-      switch(tag){
-        case (intersect(tags['artculture'], tag).length != 0):
-          umbrella.push('artculture');
-        case (intersect(tags['athletics'], tag).length != 0):
-          umbrellas.push('athletics');
-        case (intersect(tags['lectures'], tag).length != 0):
-          umbrellas.push('lectures');
-        case (intersect(tags['movies'], tag).length != 0):
-          umbrellas.push('movies');
-        case (intersect(tags['performances'], tag).length != 0):
-          umbrellas.push('performances');
-        case (intersect(tags['workshops'], tag).length != 0):
-          umbrellas.push('workshops');
-        default:
-          umbrellas.push('Undefined');
-      }
-      return umbrellas;
+  tags  = {
+    'artculture': ["University Events", "Humanities", "Art/Design", "Social Sciences"],
+    'athletics': ["Athletics"],
+    'lectures': ["Engineering/Technology", "Education", "Business", "Religious/Spiritual", "Law", "Science", "Environment"],
+    'movies': ["Movies"],
+    'performances': ["Theater & Dance", "Music", "Drama", "Comedy"],
+    'workshops': ["Community/Public Service", "Careers", "Isla Vista Community"],
+    'undefined': ["Undefined"]
+  };
+
+exports.checkUmbrella = function(input){
+  var deferred = q.defer();
+  var umbrellas = [];
+  for(var key in tags){
+    if(_.intersection(tags[key], input).length > 0){
+      umbrellas.push(key);
+    }
+  }
+  deferred.resolve(umbrellas);
+  return deferred.promise;
 }
 
 exports.arrayForTag = function(tag){
   return tags[tag];
 }
+
+exports.tags = tags;

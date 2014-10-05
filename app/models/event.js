@@ -1,54 +1,56 @@
-var mongoose    = require('mongoose');
-var Schema      = mongoose.Schema;
-var arrayForTag = require('../util/tagHelper').arrayForTag;
+var 
 
-var EventSchema = new Schema({
-  title: String,
-  description: String,
-  organizer: String,
-  startDate: { type: Date, default: Date.now },
-  endDate: { type: Date, default: Date.now },
-  tags: [ String ],
-  umbrellas: [ String ],
-  features: [ String ],
-  url: String,
-  imageUrl: String,
-  location: { type: Schema.Types.ObjectId, ref: 'Location' }
-});
+  mongoose    = require('mongoose'),
+
+  q           = require('q'),
+
+  Schema      = mongoose.Schema,
+
+  arrayForTag = require('../util/tagHelper').arrayForTag;
+
+  EventSchema = new Schema({
+    title: String,
+    description: String,
+    organizer: String,
+    startDate: { type: Date, default: Date.now },
+    endDate: { type: Date, default: Date.now },
+    tags: [ String ],
+    umbrellas: [ String ],
+    features: [ String ],
+    url: String,
+    imageUrl: String,
+    location: { type: Schema.Types.ObjectId, ref: 'Location' }
+  });
 
 EventSchema.statics.findByName = function (name, cb){
   this.find({ title: new RegExp(name, 'i')}, cb);
 };
 
-EventSchema.statics.findByTag = function(tag, cb){
-  switch(tag) {
-    case "artculture":
-      tags = ["University Events", "Humanities", "Art/Design", "Social Sciences"];
-      break;
-    case "athletics":
-      tags = ["Athletics"];
-      break;
-    case "lectures":
-      tags = ["Engineering/Technology", "Education", "Business", "Religious/Spiritual", "Law", "Science", "Environment"];
-      break;
-    case "movies":
-      tags = ["Movies"];
-      break;
-    case "performances":
-      tags = ["Theater & Dance", "Music", "Drama", "Comedy"];
-      break;
-    case "workshops":
-      tags = ["Community/Public Service", "Careers", "Isla Vista Community"];
-      break;
-
-    default:
-      break;
-  }
-
+EventSchema.statics.findByTag = function(tag){
+  var deferred = q.defer();
   this.find()
     .where('tags')
     .in(arrayForTag(tag))
-    .exec(cb);
+    .populate('location')
+    .exec(function(err, events){
+      if(err)
+        return deferred.reject(err);
+      deferred.resolve(events);
+    });
+  return deferred.promise;
+}
+
+EventSchema.statics.countByTag = function(tag){
+  var deferred = q.defer();
+  this.count()
+    .where('tags')
+    .in(arrayForTag(tag))
+    .exec(function(err, count){
+      if(err)
+        return deferred.reject(err);
+      deferred.resolve(count);
+    });
+  return deferred.promise;
 }
 
 module.exports = mongoose.model('Event', EventSchema);

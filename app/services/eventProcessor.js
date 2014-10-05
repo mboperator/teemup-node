@@ -11,6 +11,8 @@ var
 
   ucsb    = require('../services/ucsbParser'),
 
+  exports = module.exports = {};
+
   options = {};
 
 
@@ -40,8 +42,9 @@ function refreshEvents(){
     });
 }
 
-// Schedules scrape @ 7am every day
-exports.run = function(){
+Schedules scrape @ 7am every day
+
+exports.schedule = function(){
   var rule = new schedule.RecurrenceRule();
   rule.hour = 7;
   schedule.scheduleJob(rule, function(){
@@ -51,7 +54,7 @@ exports.run = function(){
   console.log("Scrape scheduled");
 }
 
-// exports.run = function(){
-//   refreshEvents();
-//   console.log("Scraping now");
-// }
+exports.run = function(){
+  refreshEvents();
+  console.log("Scraping now");
+}

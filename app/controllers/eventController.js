@@ -35,14 +35,14 @@ module.exports = function (router){
 
   router.route('/api/events/:tag')
     .get(function(req, res) {
-
+      
       Event
-        .findByTag(req.params.tag, function(err, events){
-          if (err) {
-            console.log('events/tag error: ' + err);
-            return res.send(500);
-          }
-          return res.send({'events': events});
-        });
+        .findByTag(req.params.tag)
+        .then(function(out){
+          res.send(out);
+        })
+        .fail(function(err){
+          res.send(404);
+        })
     });
 }
