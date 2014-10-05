@@ -29,11 +29,15 @@ mongoose.connect(db.url);
 // routes
 require('./app/routes')(router);
 require('./app/controllers/eventController')(router);
+require('./app/controllers/tagController')(router);
 
 app.use('', router);
 
-// scrape schedule
+// Run scrape
 eventSrc.run();
+
+// scrape schedule
+eventSrc.schedule();
 
 // rev your engines
 app.listen(port);
