@@ -1,10 +1,12 @@
 var 
 
-  mongoose    = require('mongoose'),
+  mongoose = require('mongoose'),
 
-  q           = require('q'),
+  q = require('q'),
 
-  Schema      = mongoose.Schema,
+  Schema = mongoose.Schema,
+
+  dateHelper = require('../util/dateHelper'),
 
   tagHelper = require('../util/tagHelper');
 
@@ -39,6 +41,28 @@ EventSchema.statics.findByTag = function(tag){
     });
   return deferred.promise;
 }
+
+EventSchema.statics.findByPage = function(page){
+  var deferred = q.defer();
+  var offset = Math.max(0, page);
+  var perPage = 20;
+
+  var start = dateHelper.today();
+
+  this.find()
+    .where({endDate: {$gte: start}})
+    .limit(perPage)
+    .skip(perPage * page)
+    .sort({'endDate': 'asc'})
+    .populate('location')
+    .exec(function(err, events){
+      if(err)
+        return deferred.reject(err);
+      deferred.resolve(events);
+    });
+  return deferred.promise;
+}
+
 
 EventSchema.statics.countByTag = function(tag){
   var deferred = q.defer();

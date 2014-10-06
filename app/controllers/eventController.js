@@ -18,19 +18,16 @@ module.exports = function (router){
     next()
   });
 
-  router.route('/api/events')
+  router.route('/api/events/')
     .get(function(req, res){
-
       Event
-        .find({})
-        .populate('location')
-        .exec(function(err, events) {
-          if (err) {
-            console.log('events error ' + err);
-            return res.send(500);
-          }
-          return res.send({'events': events});
-        });
+        .findByPage(req.query.page)
+        .then(function(out){
+          res.send({'events': out});
+        })
+        .fail(function(err){
+          res.send(404);
+        })
     });
 
   router.route('/api/events/:tag')

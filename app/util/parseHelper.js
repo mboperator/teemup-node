@@ -27,6 +27,6 @@ exports.processArray = function(array){
 
 exports.processDate = function(date, time){
   var deferred = q.defer();
-  var formattedDate = moment(date + ' ' + time, "MM/DD/YYYY h:mm a");
+  var formattedDate = moment(date + ' ' + time + ' -07:00', "MM/DD/YYYY h:mm a ZZ");
   return formattedDate;
 }
