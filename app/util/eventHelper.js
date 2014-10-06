@@ -33,7 +33,7 @@ exports.processEvent = function(entry){
       deferred.resolve(events[0]);
     }
   });
-  return deferred;
+  return deferred.promise;
 }
 
 function saveEvent(entry){

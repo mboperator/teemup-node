@@ -53,8 +53,8 @@ EventSchema.statics.findByPage = function(page){
     .where({endDate: {$gte: start}})
     .limit(perPage)
     .skip(perPage * page)
-    .sort({'endDate': 'asc'})
     .populate('location')
+    .sort({'endDate': 'asc'})
     .exec(function(err, events){
       if(err)
         return deferred.reject(err);
