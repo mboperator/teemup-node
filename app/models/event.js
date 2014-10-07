@@ -1,4 +1,4 @@
-var 
+var
 
   mongoose = require('mongoose'),
 
@@ -21,6 +21,7 @@ var
     features: [ String ],
     url: String,
     imageUrl: String,
+    ticketUrl: String,
     location: { type: Schema.Types.ObjectId, ref: 'Location' }
   });
 
