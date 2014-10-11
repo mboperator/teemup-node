@@ -21,6 +21,7 @@ var
     features: [ String ],
     url: String,
     imageUrl: String,
+    fullImageUrl: String,
     ticketUrl: String,
     location: { type: Schema.Types.ObjectId, ref: 'Location' }
   });

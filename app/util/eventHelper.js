@@ -43,6 +43,7 @@ function saveEvent(entry){
   var organizer = entry['events:Organizer'][0];
   var url = entry.link[0];
   var imageUrl = entry['events:MobileImage'][0];
+  var fullImageUrl = entry['events:Image'][0];
   var ticketUrl = entry['events:Tickets'][0];
   var startDate = parseHelper.processDate(entry['events:startdate'][0], entry['events:time'][0]);
   var endDate = parseHelper.processDate(entry['events:startdate'][0], entry['events:EndTime'][0]);
@@ -54,6 +55,7 @@ function saveEvent(entry){
     organizer: organizer,
     url: url,
     imageUrl: imageUrl,
+    fullImageUrl: fullImageUrl,
     ticketUrl: ticketUrl
   });
 
