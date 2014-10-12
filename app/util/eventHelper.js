@@ -9,6 +9,8 @@ var
 
   tagHelper = require('./tagHelper'),
 
+  _ = require('underscore'),
+
   exports = module.exports = {};
 
 
@@ -38,9 +40,9 @@ exports.processEvent = function(entry){
 
 function saveEvent(entry){
   var deferred = q.defer();
-  var title = entry.title[0];
-  var description = entry['events:description'][0];
-  var organizer = entry['events:Organizer'][0];
+  var title = _.unescape(entry.title[0]);
+  var description = _.unescape(entry['events:description'][0]);
+  var organizer = _.unescape(entry['events:Organizer'][0]);
   var url = entry.link[0];
   var imageUrl = entry['events:MobileImage'][0];
   var fullImageUrl = entry['events:Image'][0];
