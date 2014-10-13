@@ -34,8 +34,10 @@ EventSchema.statics.findByTag = function(tag){
   var deferred = q.defer();
   this.find()
     .where('tags')
+    .where({endDate: {$gte: start}})
     .in(tagHelper.arrayForTag(tag))
     .populate('location')
+    .sort({'endDate': 'asc'})
     .exec(function(err, events){
       if(err)
         return deferred.reject(err);

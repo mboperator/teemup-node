@@ -25,7 +25,7 @@ function aggregateEvents(){
     })
     .fail(function(err){
       console.log("Aggregate failed.");
-      return deferred.reject(out);
+      return deferred.reject(err);
     });
   return deferred.promise;
 }
