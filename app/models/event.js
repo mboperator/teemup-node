@@ -32,6 +32,8 @@ EventSchema.statics.findByName = function (name, cb){
 
 EventSchema.statics.findByTag = function(tag){
   var deferred = q.defer();
+  var start = dateHelper.today();
+  
   this.find()
     .where('tags')
     .where({endDate: {$gte: start}})
