@@ -14,9 +14,7 @@ exports.today = function(){
 }
 
 exports.addDay = function(date){
-  var result = moment(date).endOf("day");
-  console.log("Start " + moment(date).toISOString());
-  console.log("End " + result.toISOString());
+  var result = moment(date).add(24, 'hours');
   return result;
 }
 

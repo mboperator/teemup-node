@@ -6,6 +6,8 @@ var
 
   Schema = mongoose.Schema,
 
+  moment = require('moment'),
+
   dateHelper = require('../util/dateHelper'),
 
   tagHelper = require('../util/tagHelper');
@@ -32,17 +34,22 @@ EventSchema.statics.findByName = function (name, cb){
 
 EventSchema.statics.findBy = function(input){
   var deferred = q.defer();
-  var start = dateHelper.shiftDate(dateHelper.today());
+  var start = dateHelper.today();
   var query = {};
 
   if(input.date){
+    var rawStart = input.date;
+    var rawEnd = dateHelper.addDay(rawStart);
+
     var start = { 
-      endDate: {$gte: dateHelper.shiftDate(input.date)}
+      endDate: {$gte: rawStart}
     };
 
     var end = { 
-      endDate: {$lte: dateHelper.shiftDate(dateHelper.addDay(input.date))}
+      endDate: {$lt: rawEnd}
     };
+    console.log("Start " + moment(rawStart).toISOString());
+    console.log("End " + rawEnd.toISOString());
 
     if(input.tag){
       var tags = {
@@ -86,7 +93,7 @@ EventSchema.statics.findBy = function(input){
 
 EventSchema.statics.findByTag = function(tag){
   var deferred = q.defer();
-  var start = dateHelper.shiftDate(dateHelper.today());
+  var start = dateHelper.today();
   
   this.find()
     .where('tags')
