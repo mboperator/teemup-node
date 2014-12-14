@@ -48,6 +48,7 @@ EventSchema.statics.findBy = function(input){
     var end = { 
       endDate: {$lt: rawEnd}
     };
+    console.log("Input " + moment(input.date).toISOString());
     console.log("Start " + rawStart.toISOString());
     console.log("End " + rawEnd.toISOString());
 
