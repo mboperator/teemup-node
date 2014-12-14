@@ -12,6 +12,7 @@
     "body-parser": "~1.0.1",
     "agenda": "~0.6.19",
     "q": "^1.0.1",
-    "underscore": "1.7.0"
+    "underscore": "1.7.0",
+    "underscore.string": "^2.3.3"
   }
 }

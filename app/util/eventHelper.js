@@ -11,6 +11,8 @@ var
 
   _ = require('underscore'),
 
+  _s = require('underscore.string'),
+
   exports = module.exports = {};
 
 
@@ -41,7 +43,7 @@ exports.processEvent = function(entry){
 function saveEvent(entry){
   var deferred = q.defer();
   var title = _.unescape(entry.title[0]);
-  var description = _.unescape(entry['events:description'][0]);
+  var description = _s.stripTags(_.unescape(entry['events:description'][0]));
   var organizer = _.unescape(entry['events:Organizer'][0]);
   var url = entry.link[0];
   var imageUrl = entry['events:MobileImage'][0];
