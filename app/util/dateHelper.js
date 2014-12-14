@@ -2,14 +2,14 @@
 
 var
 
-  moment = require('moment'),
+  moment = require('moment-timezone'),
 
   exports = module.exports = {};
 
 
 exports.today = function(){
   var today = new Date();
-  today = moment().toDate();
+  today = moment().tz("America/Los_Angeles").toDate();
   return today;
 }
 
@@ -23,6 +23,6 @@ exports.dateToString = function(date){
 }
 
 
-exports.shiftDate = function(date){
-  return moment(date).subtract(8, 'hours');
+exports.convertToPST = function(date){
+  return moment(date).tz("America/Los_Angeles");
 }

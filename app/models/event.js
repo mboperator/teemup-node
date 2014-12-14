@@ -6,7 +6,7 @@ var
 
   Schema = mongoose.Schema,
 
-  moment = require('moment'),
+  moment = require('moment-timezone'),
 
   dateHelper = require('../util/dateHelper'),
 
@@ -38,7 +38,7 @@ EventSchema.statics.findBy = function(input){
   var query = {};
 
   if(input.date){
-    var rawStart = input.date;
+    var rawStart = dateHelper.convertToPST(input.date);
     var rawEnd = dateHelper.addDay(rawStart);
 
     var start = { 
@@ -48,7 +48,7 @@ EventSchema.statics.findBy = function(input){
     var end = { 
       endDate: {$lt: rawEnd}
     };
-    console.log("Start " + moment(rawStart).toISOString());
+    console.log("Start " + rawStart.toISOString());
     console.log("End " + rawEnd.toISOString());
 
     if(input.tag){

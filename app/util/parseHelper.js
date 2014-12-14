@@ -4,7 +4,7 @@ var
 
   q = require('q'),
 
-  moment = require('moment'),
+  moment = require('moment-timezone'),
 
   exports = module.exports = {};
 
@@ -27,7 +27,7 @@ exports.processArray = function(array){
 
 exports.processDate = function(date, time){
   var deferred = q.defer();
-  var tz = moment().format('Z z')
-  var formattedDate = moment(date + ' ' + time + ' ' + tz, "MM/DD/YYYY h:mm a ZZ ");
+  var tz = moment().tz("America/Los_Angeles").format(' Z');
+  var formattedDate = moment(date + ' ' + time + tz, "MM/DD/YYYY h:mm a ZZ ");
   return formattedDate;
 }
