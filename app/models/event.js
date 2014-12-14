@@ -32,16 +32,16 @@ EventSchema.statics.findByName = function (name, cb){
 
 EventSchema.statics.findBy = function(input){
   var deferred = q.defer();
-  var start = dateHelper.today();
+  var start = dateHelper.shiftDate(dateHelper.today());
   var query = {};
 
   if(input.date){
     var start = { 
-      endDate: {$gte: input.date}
+      endDate: {$gte: dateHelper.shiftDate(input.date)}
     };
 
     var end = { 
-      endDate: {$lte: dateHelper.addDay(input.date)}
+      endDate: {$lte: dateHelper.shiftDate(dateHelper.addDay(input.date))}
     };
 
     if(input.tag){
@@ -86,7 +86,7 @@ EventSchema.statics.findBy = function(input){
 
 EventSchema.statics.findByTag = function(tag){
   var deferred = q.defer();
-  var start = dateHelper.today();
+  var start = dateHelper.shiftDate(dateHelper.today());
   
   this.find()
     .where('tags')

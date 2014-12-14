@@ -23,3 +23,8 @@ exports.addDay = function(date){
 exports.dateToString = function(date){
   return moment(date).format('YYYY-MM-DD');
 }
+
+
+exports.shiftDate = function(date){
+  return moment(date).subtract(8, 'hours');
+}
