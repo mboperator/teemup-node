@@ -136,6 +136,7 @@ EventSchema.statics.dates = function(){
 
       for(var key in events){
         var date = events[key];
+        date = dateHelper.dateToString(date);
         dict[date] = true;
       }
 

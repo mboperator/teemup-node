@@ -19,3 +19,7 @@ exports.addDay = function(date){
   console.log("End " + result.toISOString());
   return result;
 }
+
+exports.dateToString = function(date){
+  return moment(date).format('YYYY-MM-DD');
+}
