@@ -130,6 +130,7 @@ EventSchema.statics.dates = function(){
   this
     .find()
     .distinct('startDate')
+    .where({endDate: {$gte: start}})
     .exec(function(err, events){
       if(err) return deferred.reject(err);
       var dict = {};
