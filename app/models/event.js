@@ -123,6 +123,27 @@ EventSchema.statics.findByPage = function(page){
   return deferred.promise;
 }
 
+EventSchema.statics.dates = function(){
+  var deferred = q.defer();
+  var start = dateHelper.today();
+
+  this
+    .find()
+    .distinct('startDate')
+    .exec(function(err, events){
+      if(err) return deferred.reject(err);
+      var dict = {};
+
+      for(var key in events){
+        var date = events[key];
+        dict[date] = true;
+      }
+
+      return deferred.resolve(dict);
+    });
+
+  return deferred.promise;
+}
 
 EventSchema.statics.countByTag = function(tag){
   var deferred = q.defer();
