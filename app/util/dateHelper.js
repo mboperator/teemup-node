@@ -24,5 +24,6 @@ exports.dateToString = function(date){
 
 
 exports.convertToPST = function(date){
-  return moment(date).tz("America/Los_Angeles");
+  var offset = moment().tz('America/Los_Angeles')._offset;
+  return moment(date).add(offset, 'minutes');
 }
