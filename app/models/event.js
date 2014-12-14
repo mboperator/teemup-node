@@ -30,6 +30,60 @@ EventSchema.statics.findByName = function (name, cb){
   this.find({ title: new RegExp(name, 'i')}, cb);
 };
 
+EventSchema.statics.findBy = function(input){
+  var deferred = q.defer();
+  var start = dateHelper.today();
+  var query = {};
+
+  if(input.date){
+    var start = { 
+      endDate: {$gte: input.date}
+    };
+
+    var end = { 
+      endDate: {$lte: dateHelper.addDay(input.date)}
+    };
+
+    if(input.tag){
+      var tags = {
+        tags: {$in: tagHelper.arrayForTag(input.tag)}
+      };
+      query = {
+        $and: [start, end, tags]
+      };
+    }
+
+    else{
+      query = {
+        $and: [start, end]
+      };
+    }
+
+  }
+
+  else if(!input.date && input.tag){
+    query.tags = {
+      $in: tagHelper.arrayForTag(input.tag)
+    }
+    query.endDate = { $gte: start };
+  }
+
+  else{
+    query.endDate = { $gte: start };
+  }
+  
+  this
+    .find(query)
+    .populate('location')
+    .sort({'endDate': 'asc'})
+    .exec(function(err, events){
+      if(err)
+        return deferred.reject(err);
+      return deferred.resolve(events);
+    });
+  return deferred.promise;
+}
+
 EventSchema.statics.findByTag = function(tag){
   var deferred = q.defer();
   var start = dateHelper.today();

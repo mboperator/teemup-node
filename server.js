@@ -10,7 +10,7 @@ var
 
   mongoose    = require('mongoose'),
 
-  port        = process.env.PORT || 80,
+  port        = process.env.PORT || 1337,
 
   bodyParser  = require('body-parser'),
 

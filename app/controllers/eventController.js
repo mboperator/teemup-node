@@ -4,9 +4,7 @@ var
 
 
   Event   = require('../models/event'),
-
-  ep      = require('../services/eventProcessor'),
-
+  
   eventSrc= require('../services/eventProcessor'),
 
   options = {};
@@ -18,27 +16,22 @@ module.exports = function (router){
     next()
   });
 
-  router.route('/api/events/')
+  router.route('/api/events')
     .get(function(req, res){
+      console.log("Query strings " + JSON.stringify(req.query));
+      var date = req.query.date;
+      var tag = req.query.tag;
+      var query = {
+        date: date,
+        tag: tag
+      };
       Event
-        .findByPage(req.query.page)
+        .findBy(query)
         .then(function(out){
           res.send({'events': out});
         })
         .fail(function(err){
-          res.send(404);
-        })
-    });
-
-  router.route('/api/events/:tag')
-    .get(function(req, res) {
-      
-      Event
-        .findByTag(req.params.tag)
-        .then(function(out){
-          res.send({'events': out});
-        })
-        .fail(function(err){
+          console.log("Error: " + err);
           res.send(404);
         })
     });
