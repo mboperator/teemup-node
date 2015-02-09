@@ -60,15 +60,17 @@ exports.convertToJson = function(out){
 
   var deferred = q.defer();
 
-  parser(out, {trim: true},
+  console.log("jsonHelper:: " + out);
+
+  parser(out, {trim: true, strict: false},
     function (err, result){
-      if (err)
-        deferred.reject(err);
+      if (err) return deferred.reject(err);
       // Parse JSON into Database
-      processJson(result.rss.channel[0].item);
+      console.log("jsonHelper:: ", JSON.stringify(result["RSS"]["CHANNEL"]));
+      processJson(result["RSS"]["CHANNEL"]["0"]["ITEM"]);
 
       // Return Promise
-      deferred.resolve(result.rss.channel[0].item);
+      return deferred.resolve(result["RSS"]["CHANNEL"]["0"]["ITEM"]);
     }
   );
   return deferred.promise;

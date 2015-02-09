@@ -13,7 +13,7 @@ var
 exports.processLocation = function(entry){
   var 
     deferred = q.defer(),
-    venueName = entry['events:Venue'][0];
+    venueName = entry['EVENTS:VENUE'][0];
 
   // check if querying / queried for venue already
   if (locationQueue[venueName]) {
@@ -29,13 +29,13 @@ exports.processLocation = function(entry){
       // If not, create a new location
       if(locations.length == 0){
         var
-          lng = entry['events:VenueLong'][0],
+          lng = entry['EVENTS:VENUELONG'][0],
 
-          lat = entry['events:VenueLat'][0],
+          lat = entry['EVENTS:VENUELAT'][0],
 
           coords = { lat: lat, lng: lng },
 
-          venueName = entry['events:Venue'][0],
+          venueName = entry['EVENTS:VENUE'][0],
 
           location = new Location({
             name: venueName,

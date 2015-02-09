@@ -13,15 +13,19 @@ var
 
   _s = require('underscore.string'),
 
-  exports = module.exports = {};
+  exports = module.exports = {},
+
+  TAG = "eventHelper:: ";
 
 
 
 exports.processEvent = function(entry){
+  console.log(TAG + "processEvent " + JSON.stringify(entry));
   var deferred = q.defer();
   // Look for existing event
-  Event.findByName(entry.title[0], function(err, events){
+  Event.findByName(entry["TITLE"][0], function(err, events){
     // If none found, create a new event
+    console.log(TAG + "processEvent " + events.length);
 
     if(events.length == 0){
       saveEvent(entry)
@@ -34,6 +38,7 @@ exports.processEvent = function(entry){
         });
     }
     else{
+      console.log(TAG + "processEvent " + JSON.stringify(events));
       deferred.resolve(events[0]);
     }
   });
@@ -41,16 +46,17 @@ exports.processEvent = function(entry){
 }
 
 function saveEvent(entry){
+  console.log(TAG + " saveEvent " + JSON.stringify(entry));
   var deferred = q.defer();
-  var title = _.unescape(entry.title[0]);
-  var description = _s.stripTags(_.unescape(entry['events:description'][0]));
-  var organizer = _.unescape(entry['events:Organizer'][0]);
-  var url = entry.link[0];
-  var imageUrl = entry['events:MobileImage'][0];
-  var fullImageUrl = entry['events:Image'][0];
-  var ticketUrl = entry['events:Tickets'][0];
-  var startDate = parseHelper.processDate(entry['events:startdate'][0], entry['events:time'][0]);
-  var endDate = parseHelper.processDate(entry['events:startdate'][0], entry['events:EndTime'][0]);
+  var title = _.unescape(entry["TITLE"][0]);
+  var description = _s.stripTags(_.unescape(entry['EVENTS:DESCRIPTION'][0]));
+  var organizer = _.unescape(entry['EVENTS:ORGANIZER'][0]);
+  var url = entry["LINK"][0];
+  var imageUrl = entry['EVENTS:MOBILEIMAGE'][0];
+  var fullImageUrl = entry['EVENTS:IMAGE'][0];
+  var ticketUrl = entry['EVENTS:TICKETS'][0];
+  var startDate = parseHelper.processDate(entry['EVENTS:STARTDATE'][0], entry['EVENTS:TIME'][0]);
+  var endDate = parseHelper.processDate(entry['EVENTS:STARTDATE'][0], entry['EVENTS:ENDTIME'][0]);
   var event = new Event ({
     title: title,
     startDate: startDate,
@@ -63,7 +69,7 @@ function saveEvent(entry){
     ticketUrl: ticketUrl
   });
 
-  parseHelper.processArray(entry['events:Subjects'])
+  parseHelper.processArray(entry['EVENTS:SUBJECTS'])
     .then(function(tags){
       event.tags = tags;
       tagHelper.checkUmbrella(tags)
@@ -76,7 +82,7 @@ function saveEvent(entry){
     });
 
 
-  parseHelper.processArray(entry['events:Features'])
+  parseHelper.processArray(entry['EVENTS:FEATURES'])
     .then(function(features){
       event.features = features;
     });
