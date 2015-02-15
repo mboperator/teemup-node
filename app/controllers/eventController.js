@@ -7,6 +7,8 @@ var
   
   eventSrc= require('../services/eventProcessor'),
 
+  q = require('q'),
+
   options = {};
 
 // event controller
@@ -28,7 +30,25 @@ module.exports = function (router){
       Event
         .findBy(query)
         .then(function(out){
-          res.send({'events': out});
+
+          // Cat photos
+          out.map(function(doc){
+            var deferred = q.defer();
+            if (doc.imageUrl === "") {
+              doc.imageUrl = "http://lorempixel.com/g/640/520/cats/g/";
+              doc.fullImageUrl = "http://lorempixel.com/g/640/520/cats/g/";
+            }
+            deferred.resolve(doc);
+            return deferred.promise;
+          });
+          // END CAT PHOTOS
+          q.all(out)
+            .then(function(results){
+              res.send({'events': out});
+            })
+            .fail(function(err){
+              console.log("Error", err);
+            });
         })
         .fail(function(err){
           console.log("Error: " + err);
